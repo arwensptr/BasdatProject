@@ -67,7 +67,9 @@
         @endforelse
       </div>
 
-      <div>{{ $medicines->links() }}</div>
+      <div class="mt-8 w-full">
+        {{ $medicines->links('vendor.pagination.tailwind') }}
+      </div>
     </div>
   </div>
 </x-app-layout>

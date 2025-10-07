@@ -10,10 +10,18 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        <script>
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        </script>
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen main-container">
             @include('layouts.navigation')
 
             @if (isset($header))
@@ -26,11 +34,10 @@
 
             <main>
                 <div class="py-12">
-                    {{-- Tentukan class container secara dinamis --}}
                     @php
                         $containerClass = request()->routeIs('admin.*')
-                            ? 'w-full mx-auto sm:px-6 lg:px-8' // Class untuk admin (lebar penuh)
-                            : 'max-w-7xl mx-auto sm:px-6 lg:px-8'; // Class untuk non-admin (customer, dll)
+                            ? 'w-full mx-auto sm:px-6 lg:px-8'
+                            : 'max-w-7xl mx-auto sm:px-6 lg:px-8';
                     @endphp
 
                     <div class="{{ $containerClass }}">
