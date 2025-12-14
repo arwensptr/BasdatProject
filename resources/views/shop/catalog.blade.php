@@ -53,12 +53,23 @@
                 {{-- Bagian Bawah --}}
                 <div class="mt-4 flex items-center gap-2">
                     <a class="text-brand-700 underline" href="{{ route('shop.product.show', $m) }}">Detail</a>
-                    <form method="POST" action="{{ route('shop.cart.add') }}" class="ml-auto flex gap-2 items-center">
-                        @csrf
-                        <input type="hidden" name="slug" value="{{ $m->slug }}">
-                        <input type="number" name="qty" value="1" min="1" class="w-16 border rounded-full px-3 py-1 text-center">
-                        <button class="btn btn-primary">Tambah</button>
-                    </form>
+                    
+                    {{-- LOGIKA BARU DI SINI --}}
+                    @if($m->stock > 0)
+                        <form method="POST" action="{{ route('shop.cart.add') }}" class="ml-auto flex gap-2 items-center">
+                            @csrf
+                            <input type="hidden" name="slug" value="{{ $m->slug }}">
+                            <input type="number" name="qty" value="1" min="1" max="{{ $m->stock }}" class="w-16 border rounded-full px-3 py-1 text-center">
+                            <button class="btn btn-primary">Tambah</button>
+                        </form>
+                    @else
+                        {{-- Tampilan Jika Stok Habis --}}
+                        <div class="ml-auto">
+                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-sm font-medium border border-gray-200">
+                                Stok Habis
+                            </span>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -67,7 +78,9 @@
         @endforelse
       </div>
 
-      <div>{{ $medicines->links() }}</div>
+      <div class="mt-8 w-full">
+        {{ $medicines->links('vendor.pagination.tailwind') }}
+      </div>
     </div>
   </div>
 </x-app-layout>

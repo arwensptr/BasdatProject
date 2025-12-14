@@ -8,11 +8,9 @@
 
         {{-- Brand di pojok kiri atas --}}
         <a href="{{ route('home') }}" class="absolute left-6 top-6 z-20 flex items-center gap-3 drop-shadow">
-            {{-- Ganti 'images/logo-saya.png' dengan path dan nama file gambar Anda --}}
             <img src="{{ asset('images/logo.png') }}" alt="Logo Farmacheat" class="h-6">
             <span class="text-xl font-bold text-white">Farmacheat</span>
         </a>
-
 
         {{-- Center container --}}
         <div class="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
@@ -21,7 +19,6 @@
                 <h1 class="mb-1 text-2xl font-semibold text-brand-800">Masuk</h1>
                 <p class="mb-6 text-sm text-gray-600">Silakan login untuk melanjutkan.</p>
 
-                {{-- Status Breeze --}}
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
                 <form method="POST" action="{{ route('login') }}" class="space-y-5">
@@ -39,12 +36,16 @@
                     {{-- Password --}}
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input id="password" name="password" type="password" autocomplete="current-password" required
-                               class="mt-1 block w-full rounded-xl border-gray-300 focus:border-brand-400 focus:ring-brand-300">
-                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" id="togglePassword">
+                        {{-- [FIX] Tambahkan div pembungkus dengan class="relative" di sini --}}
+                        <div class="relative mt-1">
+                            <input id="password" name="password" type="password" autocomplete="current-password" required
+                                   class="block w-full rounded-xl border-gray-300 focus:border-brand-400 focus:ring-brand-300">
+                            
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer" id="togglePassword">
                                 <ion-icon name="eye-outline" class="text-xl text-gray-600 hover:text-cyan-600"></ion-icon>
                             </span>
+                        </div>
+                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
 
                     {{-- Remember + Forgot --}}

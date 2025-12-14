@@ -22,6 +22,11 @@ class CartController extends Controller
     {
         $cart = $this->getCart();
         $items = array_values($cart);
+        // Tambahkan informasi stock terkini untuk validasi client-side
+        foreach ($items as &$it) {
+            $med = Medicine::find($it['id']);
+            $it['stock'] = $med ? (int) $med->stock : 0;
+        }
         $total = collect($items)->sum(fn($i) => $i['price'] * $i['qty']);
         $hasRx = collect($items)->contains(fn($i) => $i['is_rx'] === true);
 

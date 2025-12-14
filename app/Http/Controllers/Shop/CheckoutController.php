@@ -44,6 +44,14 @@ class CheckoutController extends Controller
         }
 
         $items = array_values($cart);
+        // Cek ketersediaan stok sebelum membuat order
+        foreach ($items as $i) {
+            $med = Medicine::find($i['id']);
+            if (!$med || $med->stock < (int) $i['qty']) {
+                return redirect()->route('shop.cart.index')->with('error', 'maaf stock tidak mencukupi');
+            }
+        }
+
         $hasRx = collect($items)->contains(fn($i) => $i['is_rx'] === true);
         $total = collect($items)->sum(fn($i) => $i['price'] * $i['qty']);
 
