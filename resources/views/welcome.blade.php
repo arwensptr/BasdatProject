@@ -7,27 +7,65 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <style>
         body {
             font-family: 'Instrument Sans', sans-serif;
             background-image: url('{{ asset('images/login-bg.jpg') }}');
-            background-size: cover;       /* biar gambar nutup seluruh layar */
-            background-position: center;  /* posisi di tengah */
-            background-attachment: fixed; /* biar ikut scroll */
-        }
-            /* EFEK KACA DENGAN BLUR YANG LEBIH TIPIS */
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(4px); /* <-- BLUR DIKURANGI JADI 4PX */
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
 
-        /* KELAS BARU UNTUK MEMAKSA JARAK ANTAR BOX */
+        /* spacing global */
+        h1, h2, p { margin-bottom: 26px; }
+
+        /* Feature section */
         .feature-grid {
             display: grid;
-            gap: 2.5rem; /* <-- INI YANG AKAN MEMBUAT JARAK ANTAR BOX */
-    }
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+        @media (min-width: 640px) {
+            .feature-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(6px);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #2563eb;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .feature-text {
+            color: #000;
+            font-size: 16px;
+            line-height: 1.75;
+        }
+
+        /* Better spacing for hero section */
+        .hero-section h1 { margin-bottom: 32px; }
+        .hero-section p { margin-bottom: 32px; }
+        .hero-section a { margin-top: 24px; }
     </style>
 </head>
 <body class="antialiased text-slate-800">
@@ -54,68 +92,72 @@
     </header>
 
     <main>
-        <section class="flex min-h-screen flex-col items-center justify-center p-4">
-            <div class="max-w-4xl text-center">
-                <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+        <!-- HERO SECTION -->
+        <section class="hero-section flex min-h-screen flex-col items-center justify-center px-4 text-center">
+            <div class="max-w-4xl">
+                <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
                     Apotek Digital Terpercaya di Ujung Jari Anda
                 </h1>
-                <p class="mt-4 text-xl text-slate-700 md:text-2xl">
+
+                <p class="mt-6 text-xl text-slate-700 md:text-2xl">
                     Solusi Cepat & Terpercaya untuk Kebutuhan Kesehatan Anda. <br>
-                    Temukan obat, vitamin, dan obat jenis lainnya dengan mudah.
+                    Temukan obat, vitamin, dan berbagai kebutuhan medis lainnya.
                 </p>
-                <br>
-                <div class="mt-8">
-                    <a href="{{ route('register') }}" class="rounded-full bg-blue-600 px-5 py-2 text-lg font-bold text-white transition hover:bg-blue-700">
+
+                <div class="mt-10">
+                    <a href="{{ route('register') }}" class="rounded-full bg-blue-600 px-6 py-3 text-lg font-bold text-white transition hover:bg-blue-700">
                         Mulai Sekarang
                     </a>
                 </div>
             </div>
         </section>
 
-        <section id="features" class="py-20 sm:py-24">
+        <!-- FEATURE SECTION -->
+        <section id="features" class="py-24">
             <div class="container mx-auto max-w-7xl px-6 lg:px-8">
-                <div class="mx-auto max-w-4xl text-center">
-                    <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Kenapa Memilih Farmacheat?</h2>
+
+                <div class="mx-auto max-w-3xl text-center mb-16">
+                    <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                        Kenapa Memilih Farmacheat?
+                    </h2>
                     <p class="mt-6 text-xl text-slate-700">
-                        Kami menyediakan layanan terbaik untuk memastikan kesehatan Anda selalu terjaga.
+                        Layanan modern, cepat, dan terpercaya untuk kebutuhan kesehatan Anda.
                     </p>
                 </div>
-                
-                <div class="feature-grid mx-auto mt-16 grid-cols-1 text-center sm:grid-cols-3">
-                    
-                    <div class="glass-effect rounded-xl p-8 shadow-lg transition-transform hover:-translate-y-2">
-                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 shadow-md">
-                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.016h-.008v-.016z" /></svg>
+
+                <div class="feature-grid">
+
+                    <!-- Box 1 -->
+                    <div class="feature-box">
+                        <div class="feature-header">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Produk Terjamin
                         </div>
-                        <h3 class="mt-5 text-xl font-semibold text-slate-900">Produk Lengkap & Terjamin</h3>
-                        <p class="mt-2 text-slate-700">
-                            Semua produk kami berasal dari distributor resmi dan terjamin keasliannya.
-                        </p>
+                        <p class="feature-text">Semua produk berasal dari distributor resmi dan terjamin keasliannya.</p>
                     </div>
 
-                    <div class="glass-effect rounded-xl p-8 shadow-lg transition-transform hover:-translate-y-2">
-                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 shadow-md">
-                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 003.375-3.375h1.5a1.125 1.125 0 011.125 1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375m17.25 4.5v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 00-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125h1.5m-17.25-4.5h9.75v-4.5H3.375z" /></svg>
+                    <!-- Box 2 -->
+                    <div class="feature-box">
+                        <div class="feature-header">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M3 13h1l2-5h11l2 5h1a2 2 0 0 1 0 4h-1a3 3 0 0 1-6 0H9a3 3 0 0 1-6 0H3a2 2 0 0 1 0-4zm4.5 5a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3zm11 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3z"/></svg>
+                            Pengantaran Cepat
                         </div>
-                        <h3 class="mt-5 text-xl font-semibold text-slate-900">Pesan Antar Cepat & Mudah</h3>
-                        <p class="mt-2 text-slate-700">
-                            Pesan dari rumah dan kami akan antarkan pesanan Anda dengan cepat dan aman.
-                        </p>
+                        <p class="feature-text">Armada pengiriman cepat memastikan pesanan sampai tepat waktu.</p>
                     </div>
 
-                    <div class="glass-effect rounded-xl p-8 shadow-lg transition-transform hover:-translate-y-2">
-                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 shadow-md">
-                        <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193l-3.72-3.72a1.5 1.5 0 01-2.122 0l-3.72-3.72a1.5 1.5 0 010-2.122l3.72-3.72a1.5 1.5 0 012.122 0l3.72 3.72zM15.75 12h.008v.008h-.008V12zM12.75 15h.008v.008h-.008V15zM10.5 12h.008v.008h-.008V12zM7.5 15h.008v.008h-.008V15zM4.5 12h.008v.008h-.008V12zM12 18.75a6 6 0 00-5.992-5.996l-3.72-3.72a1.5 1.5 0 000-2.122l3.72-3.72A6 6 0 0012 2.252a6 6 0 005.992 5.996l3.72 3.72a1.5 1.5 0 000 2.122l-3.72 3.72A6 6 0 0012 18.75z" /></svg>
+                    <!-- Box 3 -->
+                    <div class="feature-box">
+                        <div class="feature-header">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M12 1a11 11 0 1 0 0 22a11 11 0 0 0 0-22zm1 11h5v2h-7V6h2v6z"/></svg>
+                            Efisiensi Waktu
                         </div>
-                        <h3 class="mt-5 text-xl font-semibold text-slate-900">Mudah dan Praktis</h3>
-                        <p class="mt-2 text-slate-700">
-                            Ada resep dan tidak sempat ke apotek? Langsung saja pesan dari kami.
-                        </p>
+                        <p class="feature-text">Proses cepat dan rute optimal menjadikan layanan lebih efisien.</p>
                     </div>
+
                 </div>
             </div>
         </section>
-        
+
         <footer class="relative z-10 border-t border-blue-200 text-slate-700">
             <div class="container mx-auto p-6 text-center">
                 <p>&copy; {{ date('Y') }} Farmacheat. All rights reserved.</p>
@@ -123,5 +165,3 @@
         </footer>
     </main>
 
-</body>
-</html>

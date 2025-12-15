@@ -28,14 +28,15 @@ class CatalogController extends Controller
         $medicines = Medicine::query()
             ->when($q, fn($qq) => $qq->where('name', 'like', "%$q%"))
             ->when($activeCategory, function ($qq) use ($activeCategory) {
-                // if a parent category is clicked, get all its children
                 $ids = $activeCategory->children()->pluck('id')->toArray();
                 if (empty($ids)) {
                     $ids = [$activeCategory->id];
                 }
                 $qq->whereIn('category_id', $ids);
             })
-            ->orderBy('name')
+            
+            ->orderByRaw('stock = 0') 
+            ->orderBy('name', 'asc')
             ->paginate(12)
             ->withQueryString();
 

@@ -68,6 +68,39 @@
                 <a class="btn btn-white px-3 py-1" href="{{ route('shop.orders.show', $o) }}">Detail</a>
               </td>
             </tr>
+            {{-- rejection flash row(s) for this order (non-blocking) --}}
+            @if(optional($o->prescription)->status === 'rejected' && optional($o->prescription)->note)
+              <tr>
+                <td colspan="5" class="px-6 py-3">
+                  <div id="order-reject-{{ $o->id }}" class="order-reject hidden p-3 bg-red-50 border-l-4 border-red-400 text-red-800 rounded-r-lg dark:bg-red-900/30 dark:border-red-600 dark:text-red-300 transition-all duration-300 transform -translate-y-2 opacity-0">
+                    <div class="flex items-start justify-between w-full">
+                      <div class="flex-1">
+                        <p class="font-semibold">Resep ditolak untuk order #{{ $o->id }}</p>
+                        <p class="text-sm mt-1">{{ $o->prescription->note }}</p>
+                      </div>
+                      <button type="button" data-target="#order-reject-{{ $o->id }}" class="order-reject-close ml-4 text-red-700 hover:text-red-900">&times;</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            @elseif($o->paymentProofs->where('status','rejected')->isNotEmpty())
+              @php($rp = $o->paymentProofs->where('status','rejected')->sortByDesc('id')->first())
+              @if($rp && $rp->reviewer_note)
+                <tr>
+                  <td colspan="5" class="px-6 py-3">
+                    <div id="order-reject-{{ $o->id }}" class="order-reject hidden p-3 bg-red-50 border-l-4 border-red-400 text-red-800 rounded-r-lg dark:bg-red-900/30 dark:border-red-600 dark:text-red-300 transition-all duration-300 transform -translate-y-2 opacity-0">
+                      <div class="flex items-start justify-between w-full">
+                        <div class="flex-1">
+                          <p class="font-semibold">Pembayaran ditolak untuk order #{{ $o->id }}</p>
+                          <p class="text-sm mt-1">{{ $rp->reviewer_note }}</p>
+                        </div>
+                        <button type="button" data-target="#order-reject-{{ $o->id }}" class="order-reject-close ml-4 text-red-700 hover:text-red-900">&times;</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              @endif
+            @endif
           @empty
             <tr>
               <td colspan="5" class="py-6 text-center text-gray-500">Tidak ada pesanan.</td>
@@ -79,4 +112,36 @@
 
     <div>{{ $orders->links() }}</div>
   </div>
+</div>
+
+@push('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    // reveal rejection flashes then auto-hide after a delay
+    document.querySelectorAll('.order-reject').forEach(function(el){
+      if (!el) return;
+      el.classList.remove('hidden');
+      void el.offsetWidth; // force reflow
+      el.classList.remove('-translate-y-2','opacity-0');
+      clearTimeout(el._hideTimeout);
+      el._hideTimeout = setTimeout(()=>{
+        el.classList.add('-translate-y-2','opacity-0');
+        setTimeout(()=> el.classList.add('hidden'), 300);
+      }, 6000);
+    });
+
+    document.querySelectorAll('.order-reject-close').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        const selector = this.getAttribute('data-target');
+        const target = document.querySelector(selector);
+        if (!target) return;
+        clearTimeout(target._hideTimeout);
+        target.classList.add('-translate-y-2','opacity-0');
+        setTimeout(()=> target.classList.add('hidden'), 300);
+      });
+    });
+  });
+</script>
+</div>
+@endpush
 </x-app-layout>

@@ -17,15 +17,14 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->date('birth_date')->nullable();
+            $table->enum('gender', ['L', 'P'])->nullable(); 
+            $table->string('address')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->string('role')->default('customer'); 
         });
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
@@ -40,10 +39,18 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
+
     public function down(): void
     {
+        // 1. Matikan pengecekan Foreign Key (Ini kuncinya!)
+        Schema::disableForeignKeyConstraints();
+
+        // 2. Hapus tabel users
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+
+        // 3. Nyalakan lagi pengamannya
+        Schema::enableForeignKeyConstraints();
     }
 };

@@ -23,6 +23,7 @@ class OrderController extends Controller
         $status = $request->query('status'); // optional filter: open/closed/atau nama status spesifik
 
         $orders = \App\Models\Order::where('user_id', $request->user()->id)
+            ->with(['prescription','paymentProofs'])
             ->when($status, function ($q) use ($status) {
                 if ($status === 'open') {
                     $q->whereNotIn('status', ['delivered','cancelled']);

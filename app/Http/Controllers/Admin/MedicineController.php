@@ -7,7 +7,7 @@ use App\Models\Category;
 use App\Models\Medicine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage; // <-- PERBAIKAN #1: Tambahkan ini
+use Illuminate\Support\Facades\Storage; 
 
 class MedicineController extends Controller
 {
@@ -68,42 +68,6 @@ class MedicineController extends Controller
         $medicine->increment('stock', $validated['qty']);
 
         return back()->with('success', "Stok '{$medicine->name}' bertambah {$validated['qty']}.");
-    }
-
-    public function edit(Medicine $medicine)
-    {
-        $categories = Category::orderBy('name')->get();
-        return view('admin.medicines.edit', compact('medicine', 'categories'));
-    }
-
-    public function update(Request $request, Medicine $medicine)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:200',
-            'category_id' => 'nullable|exists:categories,id',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'description' => 'nullable|string|max:2000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp',
-        ]);
-
-        $data['is_prescription_only'] = $request->has('is_prescription_only');
-
-        if ($request->hasFile('image')) {
-            if ($medicine->image) {
-                Storage::disk('public')->delete($medicine->image);
-            }
-            $data['image'] = $request->file('image')->store('medicines', 'public');
-        }
-
-        // PERBAIKAN #2: Logika slug hanya dijalankan jika nama obat berubah
-        if ($request->name !== $medicine->name) {
-            $data['slug'] = $this->uniqueSlug($request->name);
-        }
-
-        $medicine->update($data);
-
-        return redirect()->route('admin.medicines.index')->with('success', 'Obat berhasil diupdate.');
     }
 
     private function uniqueSlug(string $name): string
