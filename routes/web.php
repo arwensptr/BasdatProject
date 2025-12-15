@@ -64,28 +64,29 @@ Route::middleware(['auth','role:admin'])
         Route::get('/inventory', 'inventory')->name('inventory'); 
     });
 
-    // 3. Review Resep (TETAP)
+    // 3. Review Resep 
     Route::get('/prescriptions',                    [PrescriptionReviewController::class,'index'])->name('prescriptions.index');
     Route::get('/prescriptions/{prescription}',      [PrescriptionReviewController::class,'show'])->name('prescriptions.show');
     Route::post('/prescriptions/{prescription}/approve',[PrescriptionReviewController::class,'approve'])->name('prescriptions.approve');
     Route::post('/prescriptions/{prescription}/reject', [PrescriptionReviewController::class,'reject'])->name('prescriptions.reject');
 
-    // 4. Review Pembayaran (TETAP)
+    // 4. Review Pembayaran 
     Route::get('/payments',                        [PaymentReviewController::class,'index'])->name('payments.index');
     Route::get('/payments/{payment}',              [PaymentReviewController::class,'show'])->name('payments.show');
     Route::post('/payments/{payment}/approve',     [PaymentReviewController::class,'approve'])->name('payments.approve');
     Route::post('/payments/{payment}/reject',      [PaymentReviewController::class,'reject'])->name('payments.reject');
 
-    // 5. Manajemen Order (TETAP)
+    // 5. Manajemen Order 
     Route::get('/orders',                  [AdminOrderController::class,'index'])->name('orders.index');
     Route::post('/orders/{order}/status',  [AdminOrderController::class,'updateStatus'])->name('orders.updateStatus');
     
-    // 6. Stok & Obat (CREATE, STORE, INDEX, ADDSTOCK TETAP)
+    // 6. Stok & Obat (CREATE, STORE, INDEX, ADDSTOCK)
     Route::get('/medicines',                     [MedicineController::class, 'index'])->name('medicines.index');
     Route::get('/medicines/create',              [MedicineController::class, 'create'])->name('medicines.create');
     Route::post('/medicines',                    [MedicineController::class, 'store'])->name('medicines.store');
     Route::post('/medicines/{medicine}/add-stock', [MedicineController::class, 'addStock'])->name('medicines.addStock');
-    
+    Route::get('/medicines/{medicine}/edit',        [MedicineController::class, 'edit'])->name('medicines.edit');
+    Route::patch('/medicines/{medicine}',           [MedicineController::class, 'update'])->name('medicines.update');   
 });
 
 // =====================

@@ -109,7 +109,7 @@
                             <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                                 @forelse($monthlyBestCategory as $row)
                                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
-                                        <td class="px-6 py-4 font-medium">{{ $row->nama_bulan }}</td>
+                                        <td class="px-6 py-4 font-medium">{{ $row->bulan }}</td>
                                         <td class="px-6 py-4 font-bold text-slate-800 dark:text-white">{{ $row->kategori }}</td>
                                         <td class="px-6 py-4 text-right">
                                             <span class="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-800">

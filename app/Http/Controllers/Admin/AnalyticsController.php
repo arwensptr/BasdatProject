@@ -56,15 +56,14 @@ class AnalyticsController extends Controller
         $chartData = $this->prepareTrendData($qChart->groupBy('bulan')->get(), $request);
 
         // B. Top 5 Pelanggan
-        // Nama pelanggan sudah ada di tabel fact!
         $qCust = $dw->table('fact_penjualan')
-            ->select('nama_customer as name', // Kolom: nama_customer
+            ->select('nama_pelanggan as name', // Kolom: nama_pelanggan
                      DB::raw('COUNT(penjualan_id) as total_trx'),
                      DB::raw('SUM(total_penjualan) as total_spend'))
             ->where('tahun', date('Y'));
         
         $topCustomers = $this->applyFilter($qCust, $request)
-            ->groupBy('nama_customer')
+            ->groupBy('nama_pelanggan')
             ->orderByDesc('total_spend')
             ->limit(5)
             ->get();
@@ -116,7 +115,7 @@ class AnalyticsController extends Controller
             ->select('nama_produk as nama_obat', DB::raw('SUM(quantity) as total_qty'))
             ->where('order_tahun', date('Y'));
         
-        $this->applyFilter($qPie, $request, 'bulan_tidak_ada', 'order_quarter'); 
+        $this->applyFilter($qPie, $request, 'bulan', 'order_quarter'); 
         
         $topMedicinesChart = $qPie->groupBy('nama_obat') // Group by sesuai alias
             ->orderByDesc('total_qty')
@@ -127,37 +126,37 @@ class AnalyticsController extends Controller
         $qCat = $dw->table('fact_obat')
             ->select('kategori', 
                      DB::raw('COUNT(*) as total_trx'), 
-                     // KARENA GAK ADA KOLOM HARGA, KITA SET 0 AGAR GAK ERROR
                      DB::raw('0 as total_revenue'), 
                      DB::raw('SUM(quantity) as total_qty')) 
             ->where('order_tahun', date('Y'));
 
-        $this->applyFilter($qCat, $request, 'bulan_tidak_ada', 'order_quarter');
+        $this->applyFilter($qCat, $request, 'bulan', 'order_quarter');
 
         $top10Categories = $qCat->groupBy('kategori')
-            ->orderByDesc('total_qty') // Ubah order by ke qty karena revenue 0
+            ->orderByDesc('total_qty') //
             ->limit(10)
             ->get();
 
-        // C. Resep vs Bebas (ERROR DISINI SEBELUMNYA)
+        // C. Resep vs Bebas
         $qType = $dw->table('fact_obat')
             ->select('resep', 
                      DB::raw('SUM(quantity) as qty'),
-                     // FIX: Set revenue jadi 0 karena kolom total_penjualan TIDAK ADA di tabel fact_obat
                      DB::raw('0 as revenue')) 
             ->where('order_tahun', date('Y'));
         
-        $this->applyFilter($qType, $request, 'bulan_tidak_ada', 'order_quarter');
+        $this->applyFilter($qType, $request, 'bulan', 'order_quarter');
         $rawTypeData = $qType->groupBy('resep')->get();
-
-        // Mapping Logic (Tidak perlu diubah, karena query di atas sudah menghasilkan kolom 'revenue' meski isinya 0)
         $resepVsBebas = collect(['Bebas', 'Resep'])->map(function($kategori) use ($rawTypeData) {
-            // Asumsi isi kolom resep di DB adalah "Resep" dan "Bebas" (Case Sensitive)
-            // Jika di DB isinya "Yes"/"No", ganti string di bawah ini
+    
             $found = $rawTypeData->first(function($item) use ($kategori) {
-                // Logic pencocokan kasar (bisa disesuaikan dengan isi data DB kamu)
+                // Logika baru: Mencocokkan nilai di DB ('Obat Bebas', 'Resep Dokter')
+                if ($kategori == 'Resep' && $item->resep == 'Resep Dokter') return true;
+                if ($kategori == 'Bebas' && $item->resep == 'Obat Bebas') return true;
+                
+                // Tambahkan fallback untuk nilai-nilai lama (jika ada)
                 if ($kategori == 'Resep' && ($item->resep == 'Resep' || $item->resep == 'Yes' || $item->resep == 1)) return true;
                 if ($kategori == 'Bebas' && ($item->resep == 'Bebas' || $item->resep == 'No' || $item->resep == 0)) return true;
+                
                 return false;
             });
             
@@ -168,7 +167,7 @@ class AnalyticsController extends Controller
             ];
         });
 
-        // D. Monthly Best Category (Ambil dari Fact Penjualan agar ada bulan)
+        // D. Monthly Best Category
         $qMonthCat = $dw->table('fact_penjualan')
             ->select('bulan', 'kategori', 
                      DB::raw('SUM(quantity) as total_qty'))
@@ -179,7 +178,6 @@ class AnalyticsController extends Controller
         $rawMonthData = $qMonthCat->groupBy('bulan', 'kategori')->get();
 
         $monthlyBestCategory = $rawMonthData->groupBy('bulan')->map(function ($rows) {
-            // Tambahkan property nama_bulan manual
             $firstRow = $rows->first();
             if($firstRow) {
                 $firstRow->nama_bulan = date('F', mktime(0, 0, 0, $firstRow->bulan, 1));
