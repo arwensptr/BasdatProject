@@ -57,13 +57,13 @@ class AnalyticsController extends Controller
 
         // B. Top 5 Pelanggan
         $qCust = $dw->table('fact_penjualan')
-            ->select('nama_pelanggan as name', // Kolom: nama_pelanggan
+            ->select('nama_customer as name',
                      DB::raw('COUNT(penjualan_id) as total_trx'),
                      DB::raw('SUM(total_penjualan) as total_spend'))
             ->where('tahun', date('Y'));
         
         $topCustomers = $this->applyFilter($qCust, $request)
-            ->groupBy('nama_pelanggan')
+            ->groupBy('nama_customer')
             ->orderByDesc('total_spend')
             ->limit(5)
             ->get();
