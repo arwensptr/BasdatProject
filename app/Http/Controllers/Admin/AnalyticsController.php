@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class AnalyticsController extends Controller
 {
-    // --- HELPER: LOGIKA TETAP SAMA ---
     private function prepareTrendData($queryResult, $request) {
         $targetMonths = range(1, 12);
         if ($request->quarter == 'Q1') $targetMonths = [1, 2, 3];
@@ -45,11 +44,10 @@ class AnalyticsController extends Controller
         $dw = DB::connection('mysql_dw'); 
 
         // A. Line Chart (Tren)
-        // Tidak perlu JOIN, langsung group by 'bulan'
         $qChart = $dw->table('fact_penjualan')
             ->select('bulan', 
-                     DB::raw('SUM(total_penjualan) as main_metric'), // Kolom: total_penjualan
-                     DB::raw('COUNT(penjualan_id) as sec_metric'))   // Kolom: penjualan_id
+                     DB::raw('SUM(total_penjualan) as main_metric'),
+                     DB::raw('COUNT(penjualan_id) as sec_metric'))
             ->where('tahun', date('Y'));
         
         $this->applyFilter($qChart, $request);
@@ -57,13 +55,13 @@ class AnalyticsController extends Controller
 
         // B. Top 5 Pelanggan
         $qCust = $dw->table('fact_penjualan')
-            ->select('nama_customer as name',
+            ->select('nama_pelanggan as name',
                      DB::raw('COUNT(penjualan_id) as total_trx'),
                      DB::raw('SUM(total_penjualan) as total_spend'))
             ->where('tahun', date('Y'));
         
         $topCustomers = $this->applyFilter($qCust, $request)
-            ->groupBy('nama_customer')
+            ->groupBy('nama_pelanggan')
             ->orderByDesc('total_spend')
             ->limit(5)
             ->get();
@@ -91,7 +89,6 @@ class AnalyticsController extends Controller
         
         if ($request->quarter) $qRecap->where('quarter', $request->quarter);
         
-        // Kita perlu mapping angka bulan ke Nama Bulan di PHP karena di DB cuma angka
         $monthlyRecap = $qRecap->groupBy('bulan')
             ->orderBy('bulan')
             ->get()
@@ -110,67 +107,84 @@ class AnalyticsController extends Controller
     {
         $dw = DB::connection('mysql_dw');
 
-        // A. Pie Chart (Aman)
+        // Tentukan Nama Kolom yang Tepat sesuai DW (Gambar 11c7a0):
+        $col_nama = 'nama_obat';
+        $col_qty = 'total_quantity'; // Kolom Kuantitas
+        $col_kat = 'kategori';
+        $col_resep = 'resep_sumber'; // Kolom Resep
+        
+        // Kolom waktu (TIDAK ADA prefix 'order_')
+        $col_tahun = 'tahun';
+        $col_bulan = 'bulan';
+        $col_quarter = 'quarter';
+
+        // A. Pie Chart (Obat Terlaris)
         $qPie = $dw->table('fact_obat')
-            ->select('nama_produk as nama_obat', DB::raw('SUM(quantity) as total_qty'))
-            ->where('order_tahun', date('Y'));
+            ->select($col_nama . ' as nama_obat', DB::raw("SUM($col_qty) as total_qty")) 
+            ->where($col_tahun, date('Y')); // FILTER TAHUN BENAR
         
-        $this->applyFilter($qPie, $request, 'bulan', 'order_quarter'); 
+        // Filter manual
+        if ($request->quarter) $qPie->where($col_quarter, $request->quarter);
+        if ($request->bulan) $qPie->where($col_bulan, $request->bulan); 
         
-        $topMedicinesChart = $qPie->groupBy('nama_obat') // Group by sesuai alias
+        $topMedicinesChart = $qPie->groupBy($col_nama)
             ->orderByDesc('total_qty')
             ->limit(5)
             ->get();
 
-        // B. Top 10 Kategori (Perbaikan Revenue)
+        // B. Top 10 Kategori
         $qCat = $dw->table('fact_obat')
-            ->select('kategori', 
-                     DB::raw('COUNT(*) as total_trx'), 
-                     DB::raw('0 as total_revenue'), 
-                     DB::raw('SUM(quantity) as total_qty')) 
-            ->where('order_tahun', date('Y'));
+            ->select($col_kat . ' as kategori', 
+                    DB::raw('COUNT(*) as total_trx'), 
+                    DB::raw('0 as total_revenue'), 
+                    DB::raw("SUM($col_qty) as total_qty")) 
+            ->where($col_tahun, date('Y'));
 
-        $this->applyFilter($qCat, $request, 'bulan', 'order_quarter');
+        // Filter manual
+        if ($request->quarter) $qCat->where($col_quarter, $request->quarter);
+        if ($request->bulan) $qCat->where($col_bulan, $request->bulan);
 
-        $top10Categories = $qCat->groupBy('kategori')
-            ->orderByDesc('total_qty') //
+        $top10Categories = $qCat->groupBy($col_kat)
+            ->orderByDesc('total_qty') // Order by total_qty (qty/TRX) agar terisi
             ->limit(10)
-            ->get();
+            ->get()
+            // FIX: Karena revenue di Fact Obat selalu 0, kita beri nilai kosong jika total_qty juga 0
+            ->map(function($item) {
+                $item->total_revenue = $item->total_qty > 0 ? 0 : null; 
+                return $item;
+            });
 
         // C. Resep vs Bebas
         $qType = $dw->table('fact_obat')
-            ->select('resep', 
-                     DB::raw('SUM(quantity) as qty'),
-                     DB::raw('0 as revenue')) 
-            ->where('order_tahun', date('Y'));
+            ->select($col_resep . ' as resep', 
+                    DB::raw("SUM($col_qty) as qty"))
+            ->where($col_tahun, date('Y'));
         
-        $this->applyFilter($qType, $request, 'bulan', 'order_quarter');
-        $rawTypeData = $qType->groupBy('resep')->get();
+        // Filter manual
+        if ($request->quarter) $qType->where($col_quarter, $request->quarter);
+        if ($request->bulan) $qType->where($col_bulan, $request->bulan);
+        
+        $rawTypeData = $qType->groupBy($col_resep)->get();
+
         $resepVsBebas = collect(['Bebas', 'Resep'])->map(function($kategori) use ($rawTypeData) {
-    
             $found = $rawTypeData->first(function($item) use ($kategori) {
-                // Logika baru: Mencocokkan nilai di DB ('Obat Bebas', 'Resep Dokter')
-                if ($kategori == 'Resep' && $item->resep == 'Resep Dokter') return true;
-                if ($kategori == 'Bebas' && $item->resep == 'Obat Bebas') return true;
-                
-                // Tambahkan fallback untuk nilai-nilai lama (jika ada)
-                if ($kategori == 'Resep' && ($item->resep == 'Resep' || $item->resep == 'Yes' || $item->resep == 1)) return true;
-                if ($kategori == 'Bebas' && ($item->resep == 'Bebas' || $item->resep == 'No' || $item->resep == 0)) return true;
-                
+                if ($kategori == 'Resep') return $item->resep == 'Resep Dokter';
+                if ($kategori == 'Bebas') return $item->resep == 'Obat Bebas';
                 return false;
             });
             
             return (object) [
                 'resep' => $kategori,
                 'qty' => $found ? $found->qty : 0,
-                'revenue' => $found ? $found->revenue : 0
             ];
         });
 
-        // D. Monthly Best Category
+
+        // D. Monthly Best Category (Menggunakan fact_penjualan)
+        // Query ini TIDAK MENGGUNAKAN fact_obat, jadi AMAN.
         $qMonthCat = $dw->table('fact_penjualan')
             ->select('bulan', 'kategori', 
-                     DB::raw('SUM(quantity) as total_qty'))
+                    DB::raw('SUM(quantity) as total_qty'))
             ->where('tahun', date('Y'));
 
         if($request->quarter) $qMonthCat->where('quarter', $request->quarter);

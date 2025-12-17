@@ -63,7 +63,6 @@
                             <div class="p-6 rounded-2xl border <?php echo e($type->resep == 'Resep' ? 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800' : 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'); ?>">
                                 <div class="text-xs font-bold uppercase tracking-wider <?php echo e($type->resep == 'Resep' ? 'text-purple-600' : 'text-orange-600'); ?>"><?php echo e($type->resep); ?></div>
                                 <div class="text-3xl font-bold text-slate-800 dark:text-white mt-2"><?php echo e($type->qty); ?> <span class="text-base font-normal text-slate-500">Unit</span></div>
-                                <div class="text-sm text-slate-500 mt-1">Revenue: Rp <?php echo e(number_format($type->revenue, 0, ',', '.')); ?></div>
                             </div>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
@@ -83,7 +82,6 @@
                                 <tr>
                                     <th class="px-6 py-3">Kategori</th>
                                     <th class="px-6 py-3 text-center">Trx</th>
-                                    <th class="px-6 py-3 text-right">Revenue</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
@@ -91,7 +89,6 @@
                                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
                                         <td class="px-6 py-4 font-medium text-slate-900 dark:text-white"><?php echo e($cat->kategori); ?></td>
                                         <td class="px-6 py-4 text-center"><?php echo e($cat->total_trx); ?></td>
-                                        <td class="px-6 py-4 text-right text-blue-600">Rp <?php echo e(number_format($cat->total_revenue, 0, ',', '.')); ?></td>
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <tr><td colspan="3" class="px-6 py-4 text-center">Tidak ada data</td></tr>
