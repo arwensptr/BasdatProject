@@ -1,61 +1,117 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# FARMACHEAT: SISTEM INFORMASI APOTEK ONLINE
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**FarmaCheat** adalah aplikasi berbasis web yang dirancang untuk mempermudah transaksi jual beli obat, baik obat bebas maupun obat resep dokter. Aplikasi ini juga dilengkapi dengan dashboard analitik untuk memantau performa penjualan dan inventaris.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Identitas Kelompok
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Nomor Kelompok:** J
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Anggota Kelompok:**
+1. FIRMAN HASIBUAN (164221051)
+2. SHIDQY BAIHAQY EL MUHAMMADY (164231016)
+3. ARWEN SUTANTO PUTRA (164231041)
+4. ANELIA IKA SHAFIYAH (164231078)
+5. MUHAMMAD ILHAM GUSTAMI (164231089)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Fitur Utama
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Halaman Pengguna (Customer)
+- **Katalog Obat:** Pencarian dan filter obat berdasarkan kategori.
+- **Upload Resep:** Mengunggah foto resep dokter untuk diperiksa apoteker.
+- **Keranjang & Checkout:** Transaksi pembelian obat.
+- **Upload Bukti Bayar:** Konfirmasi pembayaran manual.
+- **Riwayat Pesanan:** Melacak status pesanan (Pending, Dikirim, Selesai).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Halaman Admin (Apoteker/Manajer)
+- **Manajemen Inventaris:** CRUD Data Obat, Kategori, dan Stok.
+- **Verifikasi Resep:** Menyetujui atau menolak resep yang diunggah user.
+- **Verifikasi Pembayaran:** Memeriksa bukti transfer pelanggan.
+- **Dashboard Analitik (OLAP):** Grafik penjualan, tren pendapatan, dan obat terlaris (Terintegrasi Data Warehouse).
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Teknologi & Library
 
-### Premium Partners
+**Backend:**
+- Laravel Framework (^12.0)
+- Laravel Breeze (Authentication)
+- Laravel Sail (Docker support)
+- FakerPHP (Data Seeding)
+- PHPUnit (Testing)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**Frontend:**
+- Tailwind CSS
+- Alpine.js
+- Vite
+- Axios
 
-## Contributing
+**Database & Tools:**
+- MySQL (OLTP)
+- Pentaho Data Integration (ETL - Optional)
+- MySQL Data Warehouse (OLAP - Optional)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Persyaratan Sistem (Requirements)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Sebelum menginstall, pastikan PC anda memiliki:
+- PHP >= 8.1
+- Composer
+- Node.js & NPM
+- MySQL
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Tata Cara Instalasi (Installation Guide)
 
-## License
+Ikuti langkah-langkah berikut untuk menjalankan project di local machine:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 1. Clone & Install Dependencies
+Buka terminal di folder project, lalu jalankan perintah berikut secara berurutan:
+
+composer install
+npm install
+
+### 2. Konfigurasi Environment
+Salin file .env.example menjadi .env dan generate key aplikasi:
+
+cp .env.example .env
+php artisan key:generate
+
+### 3. Setup Database & Storage
+Pastikan database kosong sudah dibuat di MySQL, lalu jalankan migrasi dan seeder:
+
+php artisan migrate --seed
+php artisan storage:link
+
+### 4. Menjalankan Aplikasi
+Buka dua terminal berbeda untuk menjalankan server dan assets:
+
+Terminal 1 (Laravel Server):
+php artisan serve
+
+Terminal 2 (Vite Assets):
+npm run dev
+
+Akses aplikasi di browser melalui: http://127.0.0.1:8000/
+
+Akun Demo (Default Credentials)
+Setelah menjalankan php artisan migrate --seed, gunakan akun berikut untuk login:
+
+1. Akun Admin:
+
+Email: admin@demo.test
+
+Password: password
+
+2. Akun User (Contoh):
+
+Email: Customer@demo.test
+
+Password: password
+
+atau bisa membuat akun baru.
